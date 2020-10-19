@@ -179,13 +179,6 @@ delete` to delete it, and then you can add it again")
                 elif len(winner_messages) == (i + 1) + 1:  # The next element is the last element and len() returns the entire length
                     if winner_messages[i + 1][1]['score'] != winner[1]['score']:
                         break
-                # if winner_messages[i + 1][1]['score'] == winner[1]['score']:  # check if the next
-                #     if i + 1 == len(winner_messages):
-                #         winners.append(winner_messages[i + 1])  # add if it is the last winner_message
-                #         print("NEXT PERSON IS THE WINNNERE!!")
-                # because the previous words will automatically get added in the next iteration
-                # else:
-                #     break
 
             await channel.send("Today's Rate The Spook Game ends now, and the winner(s) is(are)...")
 
