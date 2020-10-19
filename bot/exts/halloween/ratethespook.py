@@ -1,7 +1,6 @@
 # NOTE: https://www.mockaroo.com/ can be good for random JSON
 # TODO: Make the quotations all the same
 # TODO: Comment everything
-# TODO: .ratethespook delete
 # TODO: one emoji from one user
 
 # Importing everything
@@ -30,12 +29,12 @@ from bot.utils.decorators import in_month
 logger = logging.getLogger(__name__)
 
 
-class RateTheSpook(Cog):
+class SpookNameRate(Cog):
     """
     A game that asks the user to spookify or halloweenify a name that is given everyday.
 
     It sends a random name everyday. The user needs to try and spookify it to his best ability and
-    send that word back using the `ratethespook add entry` command
+    send that word back using the `spooknamerate add entry` command
 
     Parameters:
         - bot: A discord.ext.commands.bot.Bot instance which represents the Discord Bot
@@ -54,7 +53,7 @@ class RateTheSpook(Cog):
             '🧟': 4,
             '😱': 5
         }
-        json_data = self.load_json(Path('bot', 'resources', 'halloween', 'ratethespook.json'))  # load the JSON
+        json_data = self.load_json(Path('bot', 'resources', 'halloween', 'spooknamerate.json'))  # load the JSON
         self.first_names = json_data['first_names']  # get the first
         self.last_names = json_data['last_names']  # and last
         # the names are from https://www.name-generator.org.uk/quick/
@@ -65,14 +64,14 @@ class RateTheSpook(Cog):
         self.announce_word.start()
 
     @in_month(Month.OCTOBER)
-    @commands.group(name="ratethespook", invoke_without_command=True)
-    async def rate_the_spook(self, ctx: Context) -> None:
-        """Get help on the Rate The Spook game."""
+    @commands.group(name="spooknamerate", invoke_without_command=True)
+    async def spook_name_rate(self, ctx: Context) -> None:
+        """Get help on the Spook Name Rate game."""
         # Send an embed with help on the command
 
         help_embed = discord.Embed(
-            title="Rate The Spook",
-            description=f"Help on the `{self.bot.command_prefix}ratethespook` command",
+            title="Spook Name Rate",
+            description=f"Help on the `{self.bot.command_prefix}spooknamerate` command",
             color=Colours.soft_orange,
         )
 
@@ -92,18 +91,18 @@ On a scale of 1 to {len(self.emojis_val)}, the reactions order:
 
         help_embed.add_field(
             name="How do I add my spookified word?",
-            value=f"Just simply type `{self.bot.command_prefix}ratethespook add my word`",
+            value=f"Just simply type `{self.bot.command_prefix}spooknamerate add my word`",
             inline=False
         )
 
         await ctx.send(embed=help_embed)
 
-    @rate_the_spook.command(name='list', aliases=["all", "entries"])
+    @spook_name_rate.command(name='list', aliases=["all", "entries"])
     async def list_entries(self, ctx: Context) -> None:
         """Send all the entries up till now in a single embed."""
         await ctx.send(embed=await self.get_responses_list(final=False))
 
-    @rate_the_spook.command(name="add", aliases=["+", "register"])
+    @spook_name_rate.command(name="add", aliases=["+", "register"])
     async def add_word(self, ctx: Context, *, word: str) -> None:
         """A command that adds your word!"""
         if not self.poll:
@@ -112,7 +111,7 @@ On a scale of 1 to {len(self.emojis_val)}, the reactions order:
             for message_id in self.messages:
                 data = self.messages.get(message_id)
                 if data['author'] == message.author:  # if the author has already added an entry
-                    return await ctx.send(f"But you have already added an entry! Type `{self.bot.command_prefix}ratethespook \
+                    return await ctx.send(f"But you have already added an entry! Type `{self.bot.command_prefix}spooknamerate \
 delete` to delete it, and then you can add it again")
 
             # otherwise
@@ -137,12 +136,17 @@ delete` to delete it, and then you can add it again")
         try:
             if reaction.emoji in self.emojis_val.keys():
                 for data in self.messages.values():
-                    if user == data['author']:
-                        return await reaction.remove()
+                    for reaction in reaction.message.reactions:
+                        if reaction.emoji in self.emojis_val.keys():
+                            if reaction.count > 1:
+                                pass
+                        # if user == data['author']:
+                        #     print(user, data)
+                        #     return await reaction.remove(user)
         except RuntimeError:  # The dictionary was changed in between
             pass
 
-    @rate_the_spook.command(name='delete')
+    @spook_name_rate.command(name='delete')
     async def delete_word(self, ctx: Context) -> None:
         """Delete's the user's word."""
         for message_id in self.messages.keys():
@@ -163,10 +167,10 @@ delete` to delete it, and then you can add it again")
 
         if self.first:
             # await self.bot.wait_until_ready()  # TODO: Check if necessary
-            for message in ["Okkey... Welcome to Rate The Spook! It's a relatively simple game.",
+            for message in ["Okkey... Welcome to Spook Name Rate! It's a relatively simple game.",
                             "Everyday, a random name will be sent in #seasonalbot-commands",
                             f"And you need to try and spookify it! Register your word using \
-`{self.bot.command_prefix}ratethespook add spookified_name`"]:
+`{self.bot.command_prefix}spooknamerate add spookified_name`"]:
                 await channel.send(message)
                 await asyncio.sleep(1)
             self.first = False  # Now it isn't the first time.
@@ -203,7 +207,7 @@ delete` to delete it, and then you can add it again")
                     if winner_messages[i + 1][1]['score'] != winner[1]['score']:
                         break
 
-            await channel.send("Today's Rate The Spook Game ends now, and the winner(s) is(are)...")
+            await channel.send("Today's Spook Name Rate Game ends now, and the winner(s) is(are)...")
 
             async with channel.typing():
                 await asyncio.sleep(1)  # give the drum roll feel
@@ -259,8 +263,8 @@ delete` to delete it, and then you can add it again")
 
         if len(self.messages) > 0:
             if final:  # if it is the final
-                embed.title = "Rate The Spook is about to end!"
-                embed.description = "This Rate The Spook round is about to end in 2 hours! You can review \
+                embed.title = "Spook Name Rate is about to end!"
+                embed.description = "This Spook Name Rate round is about to end in 2 hours! You can review \
     the entries below! Have you rated other's words?"
             else:
                 embed.title = "All the spookified names!"
@@ -291,5 +295,5 @@ delete` to delete it, and then you can add it again")
 
 
 def setup(bot: commands.Bot) -> None:
-    """Loads the RateTheSpook Cog."""
-    bot.add_cog(RateTheSpook(bot))
+    """Loads the SpookNameRate Cog."""
+    bot.add_cog(SpookNameRate(bot))
