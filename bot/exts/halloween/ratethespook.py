@@ -131,6 +131,29 @@ delete` to delete it, and then you can add it again")
             logger.info(f"{ctx.message.author} tried to add a word, but the poll had already started.")
             await ctx.send("Sorry, the poll has started! You can try and participate in the next round though!")
 
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member) -> None:
+        """Ensures that each user adds one and only one reaction."""
+        try:
+            if reaction.emoji in self.emojis_val.keys():
+                for data in self.messages.values():
+                    if user == data['author']:
+                        return await reaction.remove()
+        except RuntimeError:  # The dictionary was changed in between
+            pass
+
+    @rate_the_spook.command(name='delete')
+    async def delete_word(self, ctx: Context) -> None:
+        """Delete's the user's word."""
+        for message_id in self.messages.keys():
+            data = self.messages[message_id]
+            if ctx.author == data['author']:
+                del self.messages[message_id]
+                if self.messages.get(message_id) is None:
+                    await ctx.send(f'Message deleted successfully ({data["word"]}!')
+                else:
+                    return ctx.send("Oops, there was some error, please try again!")
+
     @tasks.loop(seconds=60.0)  # TODO: hours=24.0)
     async def announce_word(self) -> None:
         """Announces the name needed to spookify every 24 hours and the winner of the previous game."""
