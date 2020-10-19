@@ -1,5 +1,3 @@
-# NOTE: https://www.mockaroo.com/ can be good for random JSON
-# TODO: Make the quotations all the same
 # TODO: Comment everything
 # TODO: one emoji from one user
 
@@ -56,7 +54,7 @@ class SpookNameRate(Cog):
         json_data = self.load_json(Path('bot', 'resources', 'halloween', 'spooknamerate.json'))  # load the JSON
         self.first_names = json_data['first_names']  # get the first
         self.last_names = json_data['last_names']  # and last
-        # the names are from https://www.name-generator.org.uk/quick/
+        # the names are from https://www.mockaroo.com/
 
         self.first = True
         self.poll = False
