@@ -111,7 +111,8 @@ On a scale of 1 to {len(self.emojis_val)}, the reactions order:
                     return await ctx.send(f"But you have already added an entry! Type `{self.bot.command_prefix}spooknamerate \
 delete` to delete it, and then you can add it again")
                 elif data['word'] == word:
-                    return await ctx.send("TOO LATE. Someone has already added this word.")  # Someone has added the word
+                    # Someone has added the word
+                    return await ctx.send("TOO LATE. Someone has already added this word.")
 
             # otherwise
             self.messages[message.id] = {  # store it
