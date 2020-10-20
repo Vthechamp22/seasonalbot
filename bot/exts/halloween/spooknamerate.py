@@ -133,7 +133,7 @@ delete` to delete it, and then you can add it again")
             await ctx.send("Sorry, the poll has started! You can try and participate in the next round though!")  
 
     @commands.Cog.listener()
-    async def on_reaction_add(..., user: discord.User)
+    async def on_reaction_add(..., user: discord.user)
         """Ensures that each user adds one and only one reaction."""
         try:
             if reaction.emoji in self.emojis_val.keys() and reaction.message.id in self.messages.keys():
