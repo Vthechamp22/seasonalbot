@@ -1,7 +1,4 @@
-# TODO: Comment everything
-
 # Importing everything
-
 import asyncio
 import json
 import logging
@@ -24,7 +21,7 @@ from bot.constants import Month
 from bot.utils.decorators import in_month
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)  # Define the logger
 
 
 class SpookNameRate(Cog):
@@ -56,14 +53,14 @@ class SpookNameRate(Cog):
         self.last_names = json_data['last_names']  # and last
         # the names are from https://www.mockaroo.com/
         self.added_messages = ["Let's see if you win?", ":jack_o_lantern: SPOOKY :jack_o_lantern:",
-                               "If you got it, haunt it.", "TIME TO GET YOUR SPOOK ON! :skull:"]
+                               "If you got it, haunt it.", "TIME TO GET YOUR SPOOK ON! :skull:"]  # Define some messages
 
-        self.first = True
-        self.poll = False
-        self.channel_id = Channels.seasonalbot_commands
-        self.announce_word.start()
+        self.first = True  # Is it the first time?
+        self.poll = False  # A variable to track whether the poll is running
+        self.channel_id = Channels.seasonalbot_commands  # Store the id
+        self.announce_word.start()  # Start announce word
 
-    @in_month(Month.OCTOBER)
+    @in_month(Month.OCTOBER)  # Lock to OCTOBER
     @commands.group(name="spooknamerate", invoke_without_command=True)
     async def spook_name_rate(self, ctx: Context) -> None:
         """Get help on the Spook Name Rate game."""
@@ -100,7 +97,7 @@ On a scale of 1 to {len(self.emojis_val)}, the reactions order:
     @spook_name_rate.command(name='list', aliases=["all", "entries"])
     async def list_entries(self, ctx: Context) -> None:
         """Send all the entries up till now in a single embed."""
-        await ctx.send(embed=await self.get_responses_list(final=False))
+        await ctx.send(embed=await self.get_responses_list(final=False))  # Send a list of users
 
     @spook_name_rate.command(name="add", aliases=["+", "register"])
     async def add_word(self, ctx: Context, *, word: str) -> None:
@@ -114,10 +111,10 @@ On a scale of 1 to {len(self.emojis_val)}, the reactions order:
                     return await ctx.send(f"But you have already added an entry! Type `{self.bot.command_prefix}spooknamerate \
 delete` to delete it, and then you can add it again")
                 elif data['word'] == word:
-                    return await ctx.send("TOO LATE. Someone has already added this word.")
+                    return await ctx.send("TOO LATE. Someone has already added this word.")  # Someone has added the word
 
             # otherwise
-            self.messages[message.id] = {  # and store it
+            self.messages[message.id] = {  # store it
                 'word': word,  # store the word
                 'author': message.author,  # and the author
                 'score': 0,  # and the score
@@ -128,7 +125,9 @@ delete` to delete it, and then you can add it again")
 
             logger.info(f"{message.author} added the word {word!r}")
             return await ctx.send(f"{word!r} added successfullly!\n{random.choice(self.added_messages)}")
+
         else:
+
             logger.info(f"{ctx.message.author} tried to add a word, but the poll had already started.")
             await ctx.send("Sorry, the poll has started! You can try and participate in the next round though!")
 
@@ -139,6 +138,7 @@ delete` to delete it, and then you can add it again")
             if reaction.emoji in self.emojis_val.keys() and reaction.message.id in self.messages.keys():
                 msg = reaction.message
                 msg: Message
+                # create a custom counter
                 counter = {}
                 for r in msg.reactions:
                     async for user in r.users():
@@ -148,8 +148,8 @@ delete` to delete it, and then you can add it again")
                             counter[user] = 1
 
                 if counter[user] > 1 and user != self.bot.user:  # If the user has more than one reaction
-                    # if counter[member] > 1 and member != self.bot.user:  # 
                     return await reaction.remove(user)  # remove the reaction
+
         except RuntimeError:  # The dictionary was changed in between
             pass
 
@@ -160,11 +160,11 @@ delete` to delete it, and then you can add it again")
             for message_id in self.messages.keys():
                 data = self.messages[message_id]
                 if ctx.author == data['author']:
-                    del self.messages[message_id]
-                    if self.messages.get(message_id) is None:
+                    del self.messages[message_id]  # delete the data
+                    if self.messages.get(message_id) is None:  # Make sure it does not exist
                         await ctx.send(f'Message deleted successfully ({data["word"]})!')
                     else:
-                        return ctx.send("Oops, there was some error, please try again!")
+                        return await ctx.send("Oops, there was some error, please try again!")
         else:
             await ctx.send("You can't delete your word since the poll has already started!")
 
@@ -180,15 +180,17 @@ delete` to delete it, and then you can add it again")
                             "Everyday, a random name will be sent in `#seasonalbot-commands`",
                             f"And you need to try and spookify it! Register your word using \
 `{self.bot.command_prefix}spooknamerate add spookified_name`"]:
+
                 await channel.send(message)
                 await asyncio.sleep(1)
+
             self.first = False  # Now it isn't the first time.
 
         else:  # otherwise,
             if len(self.messages) > 0:  # Only if there is a player
                 await channel.send(embed=await self.get_responses_list(final=True))  # send the responses
                 self.poll = True  # start polling
-                await asyncio.sleep(2 * 60 * 60)
+                await asyncio.sleep(2 * 60 * 60)  # Sleep for 2 * 60 * 60 seconds (2 hours)
 
             logger.info('Calculating score')
             for message_id in self.messages:
