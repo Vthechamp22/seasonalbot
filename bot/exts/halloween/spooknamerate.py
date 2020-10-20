@@ -8,6 +8,7 @@ import json
 import logging
 import random
 import time
+from collections import Counter
 from pathlib import Path
 
 import discord
@@ -16,6 +17,7 @@ from discord.ext import commands, tasks
 from discord.ext.commands import Cog
 from discord.ext.commands.bot import Bot
 from discord.ext.commands.context import Context
+from discord.message import Message
 
 from bot.constants import Channels
 from bot.constants import Client
@@ -132,15 +134,23 @@ delete` to delete it, and then you can add it again")
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member) -> None:
         """Ensures that each user adds one and only one reaction."""
         try:
-            if reaction.emoji in self.emojis_val.keys():
-                for data in self.messages.values():
-                    for reaction in reaction.message.reactions:
-                        if reaction.emoji in self.emojis_val.keys():
-                            if reaction.count > 1:
-                                pass
-                        # if user == data['author']:
-                        #     print(user, data)
-                        #     return await reaction.remove(user)
+            if reaction.emoji in self.emojis_val.keys() and reaction.message.id in self.messages.keys():
+                msg = reaction.message
+                msg: Message
+                counter = {}
+                for r in msg.reactions:
+                    async for user in r.users():
+                        if user in counter:
+                            counter[user] += 1
+                        else:
+                            counter[user] = 1
+
+                print(f"{counter = }")
+                for user in counter:
+                    print(f"{user = }")
+                    if counter[user] > 1 and user != self.bot.user:
+                        print(f"BOT IS NOT USER: {user = } {self.bot.user = }")  # If the user has more than one reaction
+                        return await reaction.remove(user)  # remove the reaction
         except RuntimeError:  # The dictionary was changed in between
             pass
 
