@@ -8,7 +8,6 @@ import json
 import logging
 import random
 import time
-from collections import Counter
 from pathlib import Path
 
 import discord
@@ -154,14 +153,17 @@ delete` to delete it, and then you can add it again")
     @spook_name_rate.command(name='delete')
     async def delete_word(self, ctx: Context) -> None:
         """Delete's the user's word."""
-        for message_id in self.messages.keys():
-            data = self.messages[message_id]
-            if ctx.author == data['author']:
-                del self.messages[message_id]
-                if self.messages.get(message_id) is None:
-                    await ctx.send(f'Message deleted successfully ({data["word"]}!')
-                else:
-                    return ctx.send("Oops, there was some error, please try again!")
+        if not self.poll:
+            for message_id in self.messages.keys():
+                data = self.messages[message_id]
+                if ctx.author == data['author']:
+                    del self.messages[message_id]
+                    if self.messages.get(message_id) is None:
+                        await ctx.send(f'Message deleted successfully ({data["word"]}!')
+                    else:
+                        return ctx.send("Oops, there was some error, please try again!")
+        else:
+            await ctx.send("You can't delete your word since the poll has already started!")
 
     @tasks.loop(seconds=60.0)  # TODO: hours=24.0)
     async def announce_word(self) -> None:
@@ -208,7 +210,8 @@ delete` to delete it, and then you can add it again")
                 if len(winner_messages) > i + 1:
                     if winner_messages[i + 1][1]['score'] != winner[1]['score']:
                         break
-                elif len(winner_messages) == (i + 1) + 1:  # The next element is the last element and len() returns the entire length
+                elif len(winner_messages) == (i + 1) + 1:  # The next element is the last element and len()
+                    # returns the entire length
                     if winner_messages[i + 1][1]['score'] != winner[1]['score']:
                         break
 
