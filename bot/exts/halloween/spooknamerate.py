@@ -1,5 +1,4 @@
 # TODO: Comment everything
-# TODO: one emoji from one user
 
 # Importing everything
 
@@ -56,6 +55,8 @@ class SpookNameRate(Cog):
         self.first_names = json_data['first_names']  # get the first
         self.last_names = json_data['last_names']  # and last
         # the names are from https://www.mockaroo.com/
+        self.added_messages = ["Let's see if you win?", ":jack_o_lantern: SPOOKY :jack_o_lantern:",
+                               "If you got it, haunt it.", "TIME TO GET YOUR SPOOK ON! :skull:"]
 
         self.first = True
         self.poll = False
@@ -112,6 +113,8 @@ On a scale of 1 to {len(self.emojis_val)}, the reactions order:
                 if data['author'] == message.author:  # if the author has already added an entry
                     return await ctx.send(f"But you have already added an entry! Type `{self.bot.command_prefix}spooknamerate \
 delete` to delete it, and then you can add it again")
+                elif data['word'] == word:
+                    return await ctx.send("TOO LATE. Someone has already added this word.")
 
             # otherwise
             self.messages[message.id] = {  # and store it
@@ -124,7 +127,7 @@ delete` to delete it, and then you can add it again")
                 await message.add_reaction(emoji)  # and add them
 
             logger.info(f"{message.author} added the word {word!r}")
-            return await ctx.send(f"{word!r} added successfullly! Let's see if you win?")  # TODO: ADD RESPONSES
+            return await ctx.send(f"{word!r} added successfullly!\n{random.choice(self.added_messages)}")
         else:
             logger.info(f"{ctx.message.author} tried to add a word, but the poll had already started.")
             await ctx.send("Sorry, the poll has started! You can try and participate in the next round though!")
@@ -144,9 +147,9 @@ delete` to delete it, and then you can add it again")
                         else:
                             counter[user] = 1
 
-                for user in counter:
-                    if counter[user] > 1 and user != self.bot.user:  # If the user has more than one reaction
-                        return await reaction.remove(user)  # remove the reaction
+                if counter[user] > 1 and user != self.bot.user:  # If the user has more than one reaction
+                    # if counter[member] > 1 and member != self.bot.user:  # 
+                    return await reaction.remove(user)  # remove the reaction
         except RuntimeError:  # The dictionary was changed in between
             pass
 
@@ -159,13 +162,13 @@ delete` to delete it, and then you can add it again")
                 if ctx.author == data['author']:
                     del self.messages[message_id]
                     if self.messages.get(message_id) is None:
-                        await ctx.send(f'Message deleted successfully ({data["word"]}!')
+                        await ctx.send(f'Message deleted successfully ({data["word"]})!')
                     else:
                         return ctx.send("Oops, there was some error, please try again!")
         else:
             await ctx.send("You can't delete your word since the poll has already started!")
 
-    @tasks.loop(seconds=60.0)  # TODO: hours=24.0)
+    @tasks.loop(hours=24.0)
     async def announce_word(self) -> None:
         """Announces the name needed to spookify every 24 hours and the winner of the previous game."""
         test_perf = time.perf_counter()
@@ -173,9 +176,8 @@ delete` to delete it, and then you can add it again")
         logger.info(f"Time slept: {time.perf_counter() - test_perf:0.2f}")
 
         if self.first:
-            # await self.bot.wait_until_ready()  # TODO: Check if necessary
             for message in ["Okkey... Welcome to Spook Name Rate! It's a relatively simple game.",
-                            "Everyday, a random name will be sent in #seasonalbot-commands",
+                            "Everyday, a random name will be sent in `#seasonalbot-commands`",
                             f"And you need to try and spookify it! Register your word using \
 `{self.bot.command_prefix}spooknamerate add spookified_name`"]:
                 await channel.send(message)
@@ -186,7 +188,7 @@ delete` to delete it, and then you can add it again")
             if len(self.messages) > 0:  # Only if there is a player
                 await channel.send(embed=await self.get_responses_list(final=True))  # send the responses
                 self.poll = True  # start polling
-                await asyncio.sleep(30)  # TODO: sleep for 2 hours
+                await asyncio.sleep(2 * 60 * 60)
 
             logger.info('Calculating score')
             for message_id in self.messages:
@@ -221,7 +223,6 @@ delete` to delete it, and then you can add it again")
                 await asyncio.sleep(1)  # give the drum roll feel
 
                 if len(winners) > 0:  # make sure there is a winner
-                    # TODO: Check if tie is working
 
                     if len(winners) > 1:  # if there are more than one winners
                         await channel.send(" and ".join([win[1]['author'].mention for win in winners]) + " !")
