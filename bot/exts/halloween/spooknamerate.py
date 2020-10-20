@@ -145,11 +145,8 @@ delete` to delete it, and then you can add it again")
                         else:
                             counter[user] = 1
 
-                print(f"{counter = }")
                 for user in counter:
-                    print(f"{user = }")
-                    if counter[user] > 1 and user != self.bot.user:
-                        print(f"BOT IS NOT USER: {user = } {self.bot.user = }")  # If the user has more than one reaction
+                    if counter[user] > 1 and user != self.bot.user:  # If the user has more than one reaction
                         return await reaction.remove(user)  # remove the reaction
         except RuntimeError:  # The dictionary was changed in between
             pass
