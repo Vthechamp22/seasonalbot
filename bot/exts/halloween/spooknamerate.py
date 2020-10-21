@@ -133,7 +133,7 @@ delete` to delete it, and then you can add it again")
             await ctx.send("Sorry, the poll has started! You can try and participate in the next round though!")  
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.user)
+    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User)
         """Ensures that each user adds one and only one reaction."""
         try:
             if reaction.emoji in self.emojis_val.keys() and reaction.message.id in self.messages.keys():
@@ -150,7 +150,7 @@ delete` to delete it, and then you can add it again")
 
                 if counter[user] > 1 and user != self.bot.user:  # If the user has more than one reaction
                     await user.send("Sorry, you have already added a reaction, please remove your reaction and try again")
-                    return await reaction.remove(user)  # removes user
+                    return await reaction.remove(user)  # removes user's reaction
         except RuntimeError:  # The dictionary was changed in between
             pass
 
