@@ -303,7 +303,7 @@ delete` to delete it, and then you can add it again")
     def load_json(file: Path) -> dict:
         """Loads a JSON file and returns its contents."""
         with file.open('r', encoding='utf-8') as f:
-            return json.load(f) #returns file
+            return json.load(f) #returns file with names
 
 
 def setup(bot: commands.Bot) -> None:
