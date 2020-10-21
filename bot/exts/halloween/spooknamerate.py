@@ -77,7 +77,7 @@ class SpookNameRate(Cog):
             emoji_message += f"- {emoji} {self.emojis_val.get(emoji)}\n"
 
         help_embed.add_field(
-            name="How to play",  #display messages on HOW TO PLAY
+            name="How to play",  # display messages on HOW TO PLAY
             value=f"""Everyday, the bot will post a random word, which you will need to spookify using your creativity.
 You can rate each message according to how scary it is
 At the end of the day, the author of the message with most reactions will be the winner of the day.
@@ -88,7 +88,7 @@ On a scale of 1 to {len(self.emojis_val)}, the reactions order:
 
         help_embed.add_field(
             name="How do I add my spookified word?",
-            value=f"Just simply type `{self.bot.command_prefix}spooknamerate add my word`", #command to add spookified name
+            value=f"Just simply type `{self.bot.command_prefix}spooknamerate add my word`",  # command to add spookified name
             inline=False
         )
 
@@ -133,7 +133,7 @@ delete` to delete it, and then you can add it again")
             await ctx.send("Sorry, the poll has started! You can try and participate in the next round though!")  
 
     @commands.Cog.listener()
-    async def on_reaction_add(..., user: discord.user)
+    async def on_reaction_add(self, reaction: discord.Reactoin, user: discord.user)
         """Ensures that each user adds one and only one reaction."""
         try:
             if reaction.emoji in self.emojis_val.keys() and reaction.message.id in self.messages.keys():
@@ -163,9 +163,9 @@ delete` to delete it, and then you can add it again")
                 if ctx.author == data['author']:
                     del self.messages[message_id]  # delete the data
                     if self.messages.get(message_id) is None:  # Make sure it does not exist
-                        await ctx.send(f'Message deleted successfully ({data["word"]})!') #display if deletion successful
+                        await ctx.send(f'Message deleted successfully ({data["word"]})!')  # display if deletion successful
                     else:
-                        return await ctx.send("Oops, there was some error, please try again!") #display if deletion unsuccessful
+                        return await ctx.send("Oops, there was some error, please try again!")  # display if deletion unsuccessful
         else:
             await ctx.send("You can't delete your word since the poll has already started!")
 
@@ -220,7 +220,7 @@ delete` to delete it, and then you can add it again")
                     if winner_messages[i + 1][1]['score'] != winner[1]['score']:
                         break
 
-            await channel.send("Today's Spook Name Rate Game ends now, and the winner(s) is(are)...") #one iteration is complete
+            await channel.send("Today's Spook Name Rate Game ends now, and the winner(s) is(are)...")  # one iteration is complete
 
             async with channel.typing():
                 await asyncio.sleep(1)  # give the drum roll feel
@@ -230,7 +230,7 @@ delete` to delete it, and then you can add it again")
                     if len(winners) > 1:  # if there are more than one winners
                         await channel.send(" and ".join([win[1]['author'].mention for win in winners]) + " !")
                         score = winners[0][1]['score']
-                        await channel.send(f"Congratulations to all! You have a score of {score}!") #display winners, their words and scores
+                        await channel.send(f"Congratulations to all! You have a score of {score}!")  # display winners, their words and scores
                         wrds = ', '.join([f'{win[1]["word"]} ({win[1]["author"].mention})' for win in winners])
                         await channel.send(f"Your words were: {wrds}!")
 
@@ -241,20 +241,20 @@ delete` to delete it, and then you can add it again")
                         await channel.send(f"{winner['author'].mention}!")
                         await channel.send(f"Congratulations to {winner['author'].mention}! You have a score of \
 {winner['score']}!")
-                        await channel.send(f"Your word was: **{winner['word']}**.") #display winner, word and score
+                        await channel.send(f"Your word was: **{winner['word']}**.")  # display winner, word and score
 
                     # Send random party emojis
                     party = [random.choice([':partying_face:', ':tada:']) for _ in range(random.randint(1, 10))]
                     await channel.send(" ".join(party))
 
                 else:  # if there isn't a winner
-                    await channel.send('Hmm... Looks like no one participated! :cry:')#no participants in current iteration
+                    await channel.send('Hmm... Looks like no one participated! :cry:')  # no participants in current iteration
 
             self.messages = {}  # reset the messages
 
         # send the next name
         async with channel.typing():
-            for message in ["Anyways... let's move on to the next name!",   #starts new game
+            for message in ["Anyways... let's move on to the next name!",   # starts new game
                             "And the next name is...",  # And today's name is...
                             f"**{random.choice(self.first_names)} {random.choice(self.last_names)}**!",
                             "Try to spookify that... :smirk:"]: 
@@ -303,7 +303,7 @@ delete` to delete it, and then you can add it again")
     def load_json(file: Path) -> dict:
         """Loads a JSON file and returns its contents."""
         with file.open('r', encoding='utf-8') as f:
-            return json.load(f) #returns file with names
+            return json.load(f)  # returns file with names
 
 
 def setup(bot: commands.Bot) -> None:
